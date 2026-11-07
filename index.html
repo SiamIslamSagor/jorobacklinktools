@@ -1,1087 +1,1358 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-        <title>Joro Toolkit — Categorize, Clean & Convert</title>
-        <style>
-            :root {
-                --bg: #f4f7fb;
-                --card: #fff;
-                --text: #172033;
-                --muted: #64748b;
-                --line: #dbe3ef;
-                --primary: #2563eb;
-                --primary2: #1d4ed8;
-                --green: #16a34a;
-                --orange: #ea580c;
-                --red: #dc2626;
-                --dark: #334155;
-                --soft: #f8fafc;
-                --shadow: 0 8px 28px rgba(15, 23, 42, 0.07);
-            }
-            [data-theme="dark"] {
-                --bg: #0f172a;
-                --card: #111827;
-                --text: #e5e7eb;
-                --muted: #94a3b8;
-                --line: #334155;
-                --soft: #172033;
-                --shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
-            }
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                background: var(--bg);
-                color: var(--text);
-                font-family:
-                    Inter,
-                    system-ui,
-                    -apple-system,
-                    Segoe UI,
-                    Roboto,
-                    Arial,
-                    sans-serif;
-                transition: 0.2s;
-            }
-            .container {
-                width: min(1500px, 95%);
-                margin: 24px auto 55px;
-            }
-            .header {
-                display: flex;
-                justify-content: space-between;
-                gap: 20px;
-                align-items: flex-start;
-                margin-bottom: 18px;
-            }
-            .header h1 {
-                margin: 0;
-                font-size: 30px;
-                letter-spacing: -0.7px;
-            }
-            .header p {
-                margin: 7px 0 0;
-                color: var(--muted);
-            }
-            .theme-btn,
-            .btn {
-                border: 0;
-                border-radius: 10px;
-                padding: 10px 15px;
-                font-size: 13px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: 0.15s;
-                white-space: nowrap;
-            }
-            .btn:hover,
-            .theme-btn:hover {
-                transform: translateY(-1px);
-                filter: brightness(0.98);
-            }
-            .primary {
-                background: var(--primary);
-                color: #fff;
-            }
-            .green {
-                background: var(--green);
-                color: #fff;
-            }
-            .orange {
-                background: var(--orange);
-                color: #fff;
-            }
-            .red {
-                background: var(--red);
-                color: #fff;
-            }
-            .dark {
-                background: var(--dark);
-                color: #fff;
-            }
-            .gray {
-                background: #e2e8f0;
-                color: #172033;
-            }
-            .theme-btn {
-                background: var(--card);
-                color: var(--text);
-                border: 1px solid var(--line);
-            }
-            .tabs {
-                display: flex;
-                gap: 8px;
-                flex-wrap: wrap;
-                margin-bottom: 18px;
-                border-bottom: 1px solid var(--line);
-                padding-bottom: 12px;
-            }
-            .tab {
-                border: 1px solid var(--line);
-                background: var(--card);
-                color: var(--muted);
-                padding: 10px 16px;
-                border-radius: 10px;
-                font-weight: 750;
-                cursor: pointer;
-            }
-            .tab.active {
-                background: var(--primary);
-                border-color: var(--primary);
-                color: #fff;
-            }
-            .tab-panel {
-                display: none;
-            }
-            .tab-panel.active {
-                display: block;
-            }
-            .card {
-                background: var(--card);
-                border: 1px solid var(--line);
-                border-radius: 15px;
-                padding: 18px;
-                margin-bottom: 18px;
-                box-shadow: var(--shadow);
-            }
-            .rich-source {
-                width: 100%;
-                min-height: 300px;
-                background: var(--card);
-                color: var(--text);
-                border: 1px solid var(--line);
-                border-radius: 10px;
-                padding: 12px;
-                font:
-                    15px/1.65 Inter,
-                    system-ui,
-                    -apple-system,
-                    Segoe UI,
-                    Roboto,
-                    Arial,
-                    sans-serif;
-                outline: none;
-                resize: vertical;
-                overflow: auto;
-            }
-            .rich-source:focus {
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-            }
-            .rich-source:empty:before {
-                content: attr(data-placeholder);
-                color: var(--muted);
-            }
-            textarea,
-            input,
-            select {
-                width: 100%;
-                background: var(--card);
-                color: var(--text);
-                border: 1px solid var(--line);
-                border-radius: 10px;
-                padding: 12px;
-                font:
-                    13px/1.55 Consolas,
-                    Monaco,
-                    monospace;
-                outline: none;
-            }
-            textarea:focus,
-            input:focus,
-            select:focus {
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-            }
-            textarea {
-                min-height: 300px;
-                resize: vertical;
-            }
-            .toolbar {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 9px;
-                margin-top: 12px;
-            }
-            .toolbar .spacer {
-                flex: 1;
-            }
-            .hint {
-                font-size: 12px;
-                color: var(--muted);
-                margin: 9px 0 0;
-            }
-            .topline {
-                display: flex;
-                justify-content: space-between;
-                gap: 12px;
-                align-items: center;
-            }
-            .live {
-                font-size: 12px;
-                color: var(--muted);
-            }
-            .stats {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-                gap: 10px;
-                margin-bottom: 18px;
-            }
-            .stat {
-                background: var(--card);
-                border: 1px solid var(--line);
-                border-radius: 13px;
-                padding: 15px;
-                box-shadow: var(--shadow);
-            }
-            .stat-label {
-                color: var(--muted);
-                font-size: 12px;
-            }
-            .stat-value {
-                font-size: 25px;
-                font-weight: 800;
-                margin-top: 4px;
-            }
-            .duplicate-panel {
-                background: #fff7ed;
-                border: 1px solid #fed7aa;
-                border-radius: 13px;
-                padding: 15px;
-                margin-bottom: 18px;
-                color: #3f2a12;
-            }
-            .duplicate-panel h3 {
-                margin: 0 0 6px;
-            }
-            .duplicate-panel p {
-                margin: 0 0 12px;
-                color: #6b7280;
-            }
-            .duplicate-list {
-                max-height: 300px;
-                overflow: auto;
-                background: #fff;
-                border: 1px solid #fed7aa;
-                border-radius: 9px;
-                padding: 10px;
-                font:
-                    12px Consolas,
-                    monospace;
-            }
-            .duplicate-item {
-                padding: 7px 5px;
-                border-bottom: 1px solid #f3f4f6;
-                word-break: break-all;
-            }
-            .duplicate-item:last-child {
-                border: 0;
-            }
-            .duplicate-count {
-                font-weight: bold;
-                color: var(--red);
-            }
-            .results-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
-                gap: 18px;
-            }
-            .category {
-                background: var(--card);
-                border: 1px solid var(--line);
-                border-radius: 13px;
-                overflow: hidden;
-            }
-            .category-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 14px;
-                background: var(--soft);
-                border-bottom: 1px solid var(--line);
-                gap: 8px;
-            }
-            .category-title {
-                font-weight: 800;
-            }
-            .category-count {
-                background: var(--primary);
-                color: #fff;
-                min-width: 28px;
-                text-align: center;
-                padding: 3px 8px;
-                border-radius: 20px;
-                font-size: 12px;
-            }
-            .category textarea {
-                min-height: 190px;
-                border: 0;
-                border-radius: 0;
-                display: block;
-            }
-            .category-actions {
-                padding: 10px 14px 14px;
-                display: flex;
-                gap: 7px;
-            }
-            .category-actions button {
-                flex: 1;
-            }
-            .empty {
-                padding: 20px;
-                color: var(--muted);
-                text-align: center;
-            }
-            .converter-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 14px;
-                flex: 1;
-                min-height: 0;
-            }
-            .converter-grid > .card {
-                margin: 0;
-                display: flex;
-                flex-direction: column;
-                min-height: 0;
-            }
-            .converter-controls {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
-            }
-            .field label {
-                display: block;
-                font-size: 12px;
-                font-weight: 750;
-                margin-bottom: 6px;
-                color: var(--muted);
-            }
-            .check-row {
-                display: flex;
-                gap: 14px;
-                flex-wrap: wrap;
-                margin: 10px 0 0;
-            }
-            .check-row label {
-                display: flex;
-                align-items: center;
-                gap: 7px;
-                font-size: 13px;
-                color: var(--muted);
-            }
-            .check-row input {
-                width: auto;
-            }
-            .preview-title {
-                font-size: 13px;
-                font-weight: 800;
-                margin: 0 0 8px;
-            }
-            .converter-output {
-                min-height: 0;
-                height: auto;
-                flex: 1;
-                resize: none;
-            }
-            .converter-options {
-                padding: 13px 16px !important;
-                margin-bottom: 14px !important;
-            }
-            .search-wrap {
-                margin-bottom: 12px;
-            }
-            .hidden {
-                display: none !important;
-            }
-            .toast {
-                position: fixed;
-                bottom: 24px;
-                right: 24px;
-                background: #111827;
-                color: #fff;
-                padding: 12px 17px;
-                border-radius: 9px;
-                font-size: 13px;
-                opacity: 0;
-                pointer-events: none;
-                transform: translateY(10px);
-                transition: 0.2s;
-                z-index: 999;
-            }
-            .toast.show {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            .notice {
-                padding: 10px 13px;
-                border-radius: 9px;
-                background: #f1f5f9;
-                color: #334155;
-                border: 1px solid var(--line);
-                font-size: 13px;
-                margin-bottom: 12px;
-            }
-            #converter.active {
-                display: flex;
-                flex-direction: column;
-                height: calc(100vh - 165px);
-                min-height: 520px;
-                overflow: hidden;
-            }
-            .rich-source {
-                min-height: 0;
-                height: auto;
-                flex: 1;
-                resize: none;
-            }
-            .converter-grid .hint {
-                margin-top: 9px;
-            }
-            @media (max-width: 850px) {
-                #converter.active {
-                    height: auto;
-                    min-height: 0;
-                    overflow: visible;
-                }
-                .converter-grid {
-                    grid-template-columns: 1fr;
-                }
-                .converter-controls {
-                    grid-template-columns: 1fr 1fr;
-                }
-                .header {
-                    flex-direction: column;
-                }
-                .results-grid {
-                    grid-template-columns: 1fr;
-                }
-            }
-            @media (max-width: 560px) {
-                .container {
-                    width: 94%;
-                    margin-top: 16px;
-                }
-                .header h1 {
-                    font-size: 24px;
-                }
-                .toolbar .btn {
-                    flex: 1;
-                }
-                .converter-controls {
-                    grid-template-columns: 1fr;
-                }
-                .category-actions {
-                    flex-direction: column;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <header class="header">
-                <div>
-                    <h1>Joro Toolkit</h1>
-                    <p>Categorize, clean, deduplicate, shuffle and convert links in one workspace.</p>
-                </div>
-                <button class="theme-btn" id="themeToggle">Dark mode</button>
-            </header>
-            <nav class="tabs">
-                <button class="tab active" data-tab="categorizer">URL Categorizer</button
-                ><button class="tab" data-tab="converter">Text / Link Converter</button>
-            </nav>
-
-            <section id="categorizer" class="tab-panel active">
-                <div class="card">
-                    <div class="topline">
-                        <strong>Input URLs</strong><span id="liveStats" class="live">0 lines</span>
-                    </div>
-                    <textarea id="inputText" placeholder="Paste URLs here, one URL per line..."></textarea>
-                    <div class="toolbar">
-                        <button class="btn green" onclick="loadDemo()">Load Demo</button>
-                        <button class="btn primary" onclick="processURLs()">Categorize URLs</button>
-                        <button class="btn orange" onclick="removeDuplicates()">Remove Duplicate Domains</button>
-                        <button class="btn dark" onclick="shuffleInput()">Shuffle URLs</button>
-                        <button class="btn gray" onclick="copyInput()">Copy Input</button>
-                        <button class="btn red" onclick="clearAll()">Clear</button>
-                    </div>
-                    <div class="hint">
-                        Auto-saved locally in your browser. Shortcut: <b>Ctrl + Enter</b> to categorize.
-                    </div>
-                </div>
-                <div id="stats" class="stats hidden"></div>
-                <div id="duplicatePanel" class="duplicate-panel hidden">
-                    <h3>Duplicate Exact URLs</h3>
-                    <p id="duplicateSummary"></p>
-                    <div id="duplicateList" class="duplicate-list"></div>
-                </div>
-                <div class="search-wrap hidden" id="resultSearchWrap">
-                    <input id="resultSearch" placeholder="Filter links across visible categories..." />
-                </div>
-                <div id="results" class="results-grid"></div>
-            </section>
-
-            <section id="converter" class="tab-panel">
-                <div class="notice">
-                    <b>Smart paragraph converter:</b> paste a normal paragraph directly from a website, document,
-                    editor, or HTML source. Existing linked words are automatically detected and preserved while the
-                    surrounding text stays in place.
-                </div>
-                <div class="converter-grid">
-                    <div class="card">
-                        <div class="topline">
-                            <strong>Source Text</strong><span id="converterCount" class="live">0 links detected</span>
-                        </div>
-                        <div
-                            id="converterInput"
-                            class="rich-source"
-                            contenteditable="true"
-                            spellcheck="true"
-                            data-placeholder="Paste a paragraph here. For example: This is a paragraph with a linked word or phrase from a website..."
-                        ></div>
-                        <div class="hint">
-                            Supports pasted rich-text hyperlinks, raw HTML <code>&lt;a&gt;</code> tags, Markdown links
-                            and BBCode links. The tool auto-detects linked text.
-                        </div>
-                    </div>
-                    <div class="card">
-                        <p class="preview-title">Converted Output</p>
-                        <textarea
-                            id="converterOutput"
-                            class="converter-output"
-                            readonly
-                            placeholder="Your converted paragraph will appear here..."
-                        ></textarea>
-                        <div class="toolbar">
-                            <button class="btn primary" onclick="copyConverterOutput()">Copy Output</button
-                            ><button class="btn gray" onclick="downloadConverterOutput()">Download .txt</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card converter-options">
-                    <div class="converter-controls">
-                        <div class="field">
-                            <label>Convert linked text to</label
-                            ><select id="convertFormat">
-                                <option value="html">HTML Anchor</option>
-                                <option value="bbcode">BBCode</option>
-                                <option value="markdown">Markdown</option>
-                                <option value="plain">Plain text (remove links)</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>HTML target</label
-                            ><select id="targetOption">
-                                <option value="none">Same tab</option>
-                                <option value="blank">New tab (_blank)</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Detected link handling</label
-                            ><select id="converterDuplicates">
-                                <option value="keep">Keep all links</option>
-                                <option value="remove">Remove duplicate identical links</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>Quick action</label
-                            ><button class="btn primary" style="width: 100%" onclick="convertLinks()">
-                                ✨ Convert Text
-                            </button>
-                        </div>
-                    </div>
-                    <div class="check-row">
-                        <label><input type="checkbox" id="nofollowOption" /> Add rel="nofollow"</label
-                        ><label
-                            ><input type="checkbox" id="noopenerOption" checked /> Add noopener noreferrer for new
-                            tabs</label
-                        ><label><input type="checkbox" id="escapeTextOption" checked /> Escape HTML text safely</label>
-                    </div>
-                    <div class="toolbar">
-                        <button class="btn dark" onclick="convertLinks()">✨ Convert Text</button
-                        ><button class="btn gray" onclick="clearConverter()">Clear</button>
-                    </div>
-                </div>
-            </section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Link Toolkit — Categorize, Clean & Convert</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #fff;
+        --text: #172033;
+        --muted: #64748b;
+        --line: #dbe3ef;
+        --primary: #2563eb;
+        --primary2: #1d4ed8;
+        --green: #16a34a;
+        --orange: #ea580c;
+        --red: #dc2626;
+        --dark: #334155;
+        --soft: #f8fafc;
+        --shadow: 0 8px 28px rgba(15, 23, 42, 0.07);
+      }
+      [data-theme="dark"] {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --line: #334155;
+        --soft: #172033;
+        --shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          sans-serif;
+        transition: 0.2s;
+      }
+      .container {
+        width: min(1500px, 95%);
+        margin: 24px auto 55px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-start;
+        margin-bottom: 18px;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 30px;
+        letter-spacing: -0.7px;
+      }
+      .header p {
+        margin: 7px 0 0;
+        color: var(--muted);
+      }
+      .theme-btn,
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 15px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.15s;
+        white-space: nowrap;
+      }
+      .btn:hover,
+      .theme-btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(0.98);
+      }
+      .primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .green {
+        background: var(--green);
+        color: #fff;
+      }
+      .orange {
+        background: var(--orange);
+        color: #fff;
+      }
+      .red {
+        background: var(--red);
+        color: #fff;
+      }
+      .dark {
+        background: var(--dark);
+        color: #fff;
+      }
+      .gray {
+        background: #e2e8f0;
+        color: #172033;
+      }
+      .theme-btn {
+        background: var(--card);
+        color: var(--text);
+        border: 1px solid var(--line);
+      }
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 12px;
+      }
+      .tab {
+        border: 1px solid var(--line);
+        background: var(--card);
+        color: var(--muted);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: 750;
+        cursor: pointer;
+      }
+      .tab.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+      }
+      .tab-panel {
+        display: none;
+      }
+      .tab-panel.active {
+        display: block;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 15px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: var(--shadow);
+      }
+      .rich-source {
+        width: 100%;
+        min-height: 300px;
+        background: var(--card);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        font:
+          15px/1.65 Inter,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Arial,
+          sans-serif;
+        outline: none;
+        resize: vertical;
+        overflow: auto;
+      }
+      .rich-source:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+      .rich-source:empty:before {
+        content: attr(data-placeholder);
+        color: var(--muted);
+      }
+      textarea,
+      input,
+      select {
+        width: 100%;
+        background: var(--card);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        font:
+          13px/1.55 Consolas,
+          Monaco,
+          monospace;
+        outline: none;
+      }
+      textarea:focus,
+      input:focus,
+      select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+      textarea {
+        min-height: 300px;
+        resize: vertical;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 12px;
+      }
+      .toolbar .spacer {
+        flex: 1;
+      }
+      .hint {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 9px 0 0;
+      }
+      .topline {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+      }
+      .live {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .stat {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        padding: 15px;
+        box-shadow: var(--shadow);
+      }
+      .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .stat-value {
+        font-size: 25px;
+        font-weight: 800;
+        margin-top: 4px;
+      }
+      .duplicate-panel {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 13px;
+        padding: 15px;
+        margin-bottom: 18px;
+        color: #3f2a12;
+      }
+      .duplicate-panel h3 {
+        margin: 0 0 6px;
+      }
+      .duplicate-panel p {
+        margin: 0 0 12px;
+        color: #6b7280;
+      }
+      .duplicate-list {
+        max-height: 300px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid #fed7aa;
+        border-radius: 9px;
+        padding: 10px;
+        font:
+          12px Consolas,
+          monospace;
+      }
+      .duplicate-item {
+        padding: 7px 5px;
+        border-bottom: 1px solid #f3f4f6;
+        word-break: break-all;
+      }
+      .duplicate-item:last-child {
+        border: 0;
+      }
+      .duplicate-count {
+        font-weight: bold;
+        color: var(--red);
+      }
+      .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+        gap: 18px;
+      }
+      .category {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 13px;
+        overflow: hidden;
+      }
+      .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        background: var(--soft);
+        border-bottom: 1px solid var(--line);
+        gap: 8px;
+      }
+      .category-title {
+        font-weight: 800;
+      }
+      .category-count {
+        background: var(--primary);
+        color: #fff;
+        min-width: 28px;
+        text-align: center;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+      .category textarea {
+        min-height: 190px;
+        border: 0;
+        border-radius: 0;
+        display: block;
+      }
+      .category-actions {
+        padding: 10px 14px 14px;
+        display: flex;
+        gap: 7px;
+      }
+      .category-actions button {
+        flex: 1;
+      }
+      .empty {
+        padding: 20px;
+        color: var(--muted);
+        text-align: center;
+      }
+      .converter-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        flex: 1;
+        min-height: 0;
+      }
+      .converter-grid > .card {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .converter-controls {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 750;
+        margin-bottom: 6px;
+        color: var(--muted);
+      }
+      .check-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin: 10px 0 0;
+      }
+      .check-row label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .check-row input {
+        width: auto;
+      }
+      .preview-title {
+        font-size: 13px;
+        font-weight: 800;
+        margin: 0 0 8px;
+      }
+      .converter-output {
+        min-height: 0;
+        height: auto;
+        flex: 1;
+        resize: none;
+      }
+      .converter-options {
+        padding: 13px 16px !important;
+        margin-bottom: 14px !important;
+      }
+      .search-wrap {
+        margin-bottom: 12px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #111827;
+        color: #fff;
+        padding: 12px 17px;
+        border-radius: 9px;
+        font-size: 13px;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(10px);
+        transition: 0.2s;
+        z-index: 999;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .notice {
+        padding: 10px 13px;
+        border-radius: 9px;
+        background: #f1f5f9;
+        color: #334155;
+        border: 1px solid var(--line);
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+      #converter.active {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 165px);
+        min-height: 520px;
+        overflow: hidden;
+      }
+      .rich-source {
+        min-height: 0;
+        height: auto;
+        flex: 1;
+        resize: none;
+      }
+      .converter-grid .hint {
+        margin-top: 9px;
+      }
+      @media (max-width: 850px) {
+        #converter.active {
+          height: auto;
+          min-height: 0;
+          overflow: visible;
+        }
+        .converter-grid {
+          grid-template-columns: 1fr;
+        }
+        .converter-controls {
+          grid-template-columns: 1fr 1fr;
+        }
+        .header {
+          flex-direction: column;
+        }
+        .results-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .container {
+          width: 94%;
+          margin-top: 16px;
+        }
+        .header h1 {
+          font-size: 24px;
+        }
+        .toolbar .btn {
+          flex: 1;
+        }
+        .converter-controls {
+          grid-template-columns: 1fr;
+        }
+        .category-actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <div>
+          <h1>Link Toolkit</h1>
+          <p>
+            Categorize, clean, deduplicate, shuffle and convert links in one
+            workspace.
+          </p>
         </div>
-        <div id="toast" class="toast">Copied!</div>
-        <script>
-            const categoryNames = {
-                other: "Other",
-                chineseHtml: "Chinese HTML",
-                pixelWebApp: "Pixel / Web.app",
-                journal: "Journal Blog",
-                boardTopic: "Board Topic",
-                forumTopic: "Forum Topic",
-                metaComment: "Meta Comment",
-                edu: "EDU",
-                gov: "GOV",
-                org: "ORG",
-                bloggerHtml: "Blogger HTML",
-            };
-            const STORAGE = {
-                input: "linkToolkit.input.v2",
-                converter: "linkToolkit.converter.v2",
-                theme: "linkToolkit.theme.v2",
-            };
-            function createCategories() {
-                return {
-                    other: [],
-                    chineseHtml: [],
-                    pixelWebApp: [],
-                    journal: [],
-                    boardTopic: [],
-                    forumTopic: [],
-                    metaComment: [],
-                    edu: [],
-                    gov: [],
-                    org: [],
-                    bloggerHtml: [],
-                };
-            }
-            function categorizeLinks(inputText) {
-                const categories = createCategories();
-                const lines = inputText
-                    .split(/\r?\n/)
-                    .map((x) => x.trim())
-                    .filter(Boolean);
-                for (const link of lines) {
-                    let url;
-                    try {
-                        url = new URL(link);
-                    } catch {
-                        categories.other.push(link);
-                        continue;
-                    }
-                    const hostname = url.hostname.toLowerCase(),
-                        pathname = url.pathname.toLowerCase();
-                    const hasCommentId = [...url.searchParams.keys()].some((k) => k.toLowerCase() === "commentid");
-                    const seg = pathname.split("/").filter(Boolean);
-                    const i = seg.findIndex((s) => s === "post" || s === "single-post");
-                    const hasArticle = i !== -1 && i < seg.length - 1 && seg[i + 1].length > 0;
-                    if (hasCommentId || hasArticle) {
-                        categories.metaComment.push(link);
-                        continue;
-                    }
-                    if (hostname.endsWith(".web.app")) {
-                        categories.pixelWebApp.push(link);
-                        continue;
-                    }
-                    if (pathname.includes("/board/topic/") || pathname.includes("/board/board_topic/")) {
-                        categories.boardTopic.push(link);
-                        continue;
-                    }
-                    if (pathname.includes("/forum/topic/")) {
-                        categories.forumTopic.push(link);
-                        continue;
-                    }
-                    if (
-                        pathname.includes("/journal3/") ||
-                        pathname.includes("/journal2/") ||
-                        pathname.includes("/journal/") ||
-                        pathname.includes("journal-blog") ||
-                        pathname.includes("journal_blog") ||
-                        pathname.includes("/blog/") ||
-                        pathname.startsWith("/blog") ||
-                        pathname.includes("/blog03/") ||
-                        pathname.includes("/blog02/") ||
-                        pathname.includes("/blog01/")
-                    ) {
-                        categories.journal.push(link);
-                        continue;
-                    }
-                    if (hostname.endsWith(".edu") || hostname.includes(".edu.")) {
-                        categories.edu.push(link);
-                        continue;
-                    }
-                    if (hostname.endsWith(".gov") || hostname.includes(".gov.")) {
-                        categories.gov.push(link);
-                        continue;
-                    }
-                    if (hostname.endsWith(".org") || hostname.includes(".org.")) {
-                        categories.org.push(link);
-                        continue;
-                    }
-                    if (/\/\d+\.html$/i.test(pathname)) {
-                        categories.chineseHtml.push(link);
-                        continue;
-                    }
-                    if (pathname.endsWith(".html")) {
-                        categories.bloggerHtml.push(link);
-                        continue;
-                    }
-                    categories.other.push(link);
-                }
-                return categories;
-            }
-            function processURLs(options = {}) {
-                const input = inputText.value;
-                if (!input.trim()) {
-                    results.innerHTML = "";
-                    stats.innerHTML = "";
-                    stats.classList.add("hidden");
-                    duplicatePanel.classList.add("hidden");
-                    resultSearchWrap.classList.add("hidden");
-                    saveInput();
-                    return;
-                }
-                const categories = categorizeLinks(input);
-                displayResults(categories);
-                analyzeDuplicates(input);
-                saveInput();
-            }
-            function displayResults(categories) {
-                results.innerHTML = "";
-                for (const key in categories) {
-                    const links = categories[key];
-                    const card = document.createElement("div");
-                    card.className = "category";
-                    card.dataset.key = key;
-                    card.innerHTML = `<div class="category-header"><div class="category-title">${categoryNames[key]}</div><div class="category-count">${links.length}</div></div><textarea id="output-${key}" readonly>${escapeHtml(links.join("\n"))}</textarea><div class="category-actions"><button class="btn dark" onclick="copyCategory('${key}')">Copy</button><button class="btn gray" onclick="shuffleCategory('${key}')">Shuffle</button></div>`;
-                    results.appendChild(card);
-                }
-                updateStats(categories);
-                resultSearchWrap.classList.remove("hidden");
-            }
-            function getDomainUniqueData(lines) {
-                const seen = new Set(),
-                    unique = [];
-                let removed = 0;
-                for (const link of lines) {
-                    const domain = getDomainKey(link);
-                    const key = domain ? `domain:${domain}` : `invalid:${unique.length}`;
-                    if (domain && seen.has(key)) {
-                        removed++;
-                        continue;
-                    }
-                    if (domain) seen.add(key);
-                    unique.push(link);
-                }
-                return { unique, removed };
-            }
-            function updateStats(categories) {
-                let total = 0;
-                for (const k in categories) total += categories[k].length;
-                const lines = getInputLines();
-                const domainData = getDomainUniqueData(lines);
-                const exactUnique = new Set(lines).size;
-                const exactDuplicateEntries = lines.length - exactUnique;
-                stats.classList.remove("hidden");
-                stats.innerHTML = `<div class="stat"><div class="stat-label">Total URLs</div><div class="stat-value">${total}</div></div><div class="stat"><div class="stat-label">Unique URLs</div><div class="stat-value">${domainData.unique.length}</div></div><div class="stat"><div class="stat-label">Duplicate Domains</div><div class="stat-value">${domainData.removed}</div></div><div class="stat"><div class="stat-label">Exact Duplicate Entries</div><div class="stat-value">${exactDuplicateEntries}</div></div><div class="stat"><div class="stat-label">Categories</div><div class="stat-value">${Object.keys(categories).length}</div></div>`;
-            }
-            function analyzeDuplicates(input) {
-                const lines = input
-                        .split(/\r?\n/)
-                        .map((x) => x.trim())
-                        .filter(Boolean),
-                    counts = new Map();
-                lines.forEach((x) => counts.set(x, (counts.get(x) || 0) + 1));
-                const duplicates = [...counts.entries()].filter(([, c]) => c > 1);
-                duplicatePanel.classList.remove("hidden");
-                if (!duplicates.length) {
-                    duplicateSummary.textContent = "No duplicate exact URLs found.";
-                    duplicateList.innerHTML = "<div>No duplicates.</div>";
-                    return;
-                }
-                const entries = duplicates.reduce((t, [, c]) => t + c - 1, 0);
-                duplicateSummary.textContent = `${duplicates.length} unique URLs are duplicated, creating ${entries} duplicate entries.`;
-                duplicateList.innerHTML = duplicates
-                    .map(
-                        ([l, c]) =>
-                            `<div class="duplicate-item"><span class="duplicate-count">${c}×</span>&nbsp; ${escapeHtml(l)}</div>`
-                    )
-                    .join("");
-            }
-            function getDomainKey(link) {
-                try {
-                    return new URL(link.trim()).hostname.toLowerCase().replace(/^www\./, "");
-                } catch {
-                    return null;
-                }
-            }
-            function removeDuplicates() {
-                const lines = getInputLines();
-                if (!lines.length) return showToast("No URLs to process.");
-                const data = getDomainUniqueData(lines);
-                inputText.value = data.unique.join("\n");
-                processURLs();
-                showToast(
-                    data.removed ? `${data.removed} duplicate domain URLs removed.` : "No duplicate domains found."
-                );
-            }
-            function shuffleArray(a) {
-                for (let i = a.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [a[i], a[j]] = [a[j], a[i]];
-                }
-            }
-            function shuffleInput() {
-                const a = getInputLines();
-                if (!a.length) return showToast("No URLs to shuffle.");
-                shuffleArray(a);
-                inputText.value = a.join("\n");
-                processURLs();
-                showToast("URLs shuffled.");
-            }
-            function shuffleCategory(k) {
-                const t = document.getElementById("output-" + k);
-                if (!t || !t.value.trim()) return showToast("This category is empty.");
-                const a = t.value.split(/\r?\n/).filter(Boolean);
-                shuffleArray(a);
-                t.value = a.join("\n");
-                showToast(categoryNames[k] + " shuffled.");
-            }
-            function copyCategory(k) {
-                const t = document.getElementById("output-" + k);
-                if (!t || !t.value) return showToast("Category is empty.");
-                copyText(t.value);
-            }
-            function copyInput() {
-                if (!inputText.value.trim()) return showToast("Input is empty.");
-                copyText(inputText.value);
-            }
-            function copyText(text) {
-                navigator.clipboard
-                    ?.writeText(text)
-                    .then(() => showToast("Copied!"))
-                    .catch(() => {
-                        const t = document.createElement("textarea");
-                        t.value = text;
-                        document.body.appendChild(t);
-                        t.select();
-                        document.execCommand("copy");
-                        t.remove();
-                        showToast("Copied!");
-                    });
-            }
-            function getInputLines() {
-                return inputText.value
-                    .split(/\r?\n/)
-                    .map((x) => x.trim())
-                    .filter(Boolean);
-            }
-            function clearAll() {
-                if (!confirm("Clear all URLs and results?")) return;
-                inputText.value = "";
-                results.innerHTML = "";
-                stats.innerHTML = "";
-                stats.classList.add("hidden");
-                duplicatePanel.classList.add("hidden");
-                duplicateList.innerHTML = "";
-                resultSearchWrap.classList.add("hidden");
-                localStorage.removeItem(STORAGE.input);
-                updateLiveStats();
-                showToast("Cleared.");
-            }
-            function loadDemo() {
-                const demo = `https://www.chaoqgroup.com/blog/best-leather-bags\nhttps://example.com/123.html\nhttps://example.com/article-name.html\nhttps://test-site.web.app/?topic=ABC123\nhttps://example.edu/news/example\nhttps://example.gov/official/news\nhttps://example.org/about-us\nhttps://example.com/forum/topic/64758/test-topic\nhttps://example.com/post/simple-article-title?commentId=123\nhttps://example.com/post/simple-article-title`;
-                inputText.value = demo;
-                processURLs();
-                updateLiveStats();
-            }
-            function escapeHtml(t) {
-                return String(t)
-                    .replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
-            }
-            let toastTimer;
-            function showToast(m) {
-                toast.textContent = m;
-                toast.classList.add("show");
-                clearTimeout(toastTimer);
-                toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
-            }
-            function saveInput() {
-                localStorage.setItem(STORAGE.input, inputText.value);
-            }
-            function updateLiveStats() {
-                const lines = getInputLines();
-                const valid = lines.filter((x) => {
-                    try {
-                        new URL(x);
-                        return true;
-                    } catch {
-                        return false;
-                    }
-                }).length;
-                const unique = getDomainUniqueData(lines).unique.length;
-                liveStats.textContent = `${lines.length} lines • ${valid} valid URLs • ${unique} unique`;
-            }
-            function normalizeSourceToHtml(raw) {
-                const trimmed = raw.trim();
-                if (!trimmed) return "";
-                // Raw HTML pasted/typed into the editor
-                if (/<a\b[^>]*href\s*=/i.test(trimmed)) return trimmed;
-                // Convert Markdown and BBCode into HTML anchors before DOM processing
-                let html = escapeHtml(trimmed)
-                    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi, '<a href="$2">$1</a>')
-                    .replace(/\[url=(https?:\/\/[^\]]+)\]([\s\S]*?)\[\/url\]/gi, '<a href="$1">$2</a>');
-                return html.replace(/\n/g, "<br>");
-            }
-            function getConverterSourceHtml() {
-                const editor = document.getElementById("converterInput");
-                const raw = editor.innerHTML.trim();
-                // If user typed literal HTML into contenteditable, browser may have escaped it.
-                const text = editor.innerText.trim();
-                if (/<a\b[^>]*href\s*=/i.test(text) && !editor.querySelector("a")) return normalizeSourceToHtml(text);
-                return raw;
-            }
-            function sourceDom() {
-                const wrapper = document.createElement("div");
-                wrapper.innerHTML = getConverterSourceHtml();
-                // Detect Markdown / BBCode that may still be plain text in the editor.
-                if (!wrapper.querySelector("a")) {
-                    wrapper.innerHTML = normalizeSourceToHtml(wrapper.innerText);
-                }
-                return wrapper;
-            }
-            function convertNode(node, format, opts, seen) {
-                if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
-                if (node.nodeType !== Node.ELEMENT_NODE) return "";
-                if (node.tagName === "BR") return "\n";
-                if (node.tagName === "A") {
-                    const href = node.getAttribute("href") || "";
-                    const text = node.textContent || href;
-                    const key = href + "\u0000" + text;
-                    if (opts.removeDuplicates && seen.has(key)) return text;
-                    seen.add(key);
-                    if (format === "plain") return text;
-                    if (format === "markdown") return `[${text}](${href})`;
-                    if (format === "bbcode") return `[url=${href}]${text}[/url]`;
-                    const safeText = opts.safe ? escapeHtml(text) : text;
-                    let attrs = `href="${escapeHtml(href)}"`;
-                    if (opts.target === "blank") attrs += ' target="_blank"';
-                    const rel = [];
-                    if (opts.nofollow) rel.push("nofollow");
-                    if (opts.target === "blank" && opts.noopener) rel.push("noopener", "noreferrer");
-                    if (rel.length) attrs += ` rel="${rel.join(" ")}"`;
-                    return `<a ${attrs}>${safeText}</a>`;
-                }
-                const children = [...node.childNodes].map((n) => convertNode(n, format, opts, seen)).join("");
-                if (format === "html") {
-                    // Preserve basic paragraph/list structure for HTML output.
-                    const tag = node.tagName.toLowerCase();
-                    if (["p", "div", "li", "blockquote", "h1", "h2", "h3", "h4", "h5", "h6"].includes(tag))
-                        return `<${tag}>${children}</${tag}>`;
-                }
-                if (["P", "DIV", "LI", "BLOCKQUOTE"].includes(node.tagName)) return children + "\n";
-                return children;
-            }
-            function countDetectedLinks() {
-                const dom = sourceDom();
-                return dom.querySelectorAll("a[href]").length;
-            }
-            function convertLinks() {
-                const editor = document.getElementById("converterInput");
-                if (!editor.innerText.trim()) return showToast("Please paste some source text first.");
-                const dom = sourceDom();
-                const format = convertFormat.value;
-                const opts = {
-                    target: targetOption.value,
-                    nofollow: nofollowOption.checked,
-                    noopener: noopenerOption.checked,
-                    safe: escapeTextOption.checked,
-                    removeDuplicates: converterDuplicates.value === "remove",
-                };
-                const seen = new Set();
-                const out = [...dom.childNodes]
-                    .map((n) => convertNode(n, format, opts, seen))
-                    .join("")
-                    .replace(/\n{3,}/g, "\n\n")
-                    .trim();
-                converterOutput.value = out;
-                localStorage.setItem(STORAGE.converter, editor.innerHTML);
-                const count = dom.querySelectorAll("a[href]").length;
-                showToast(`${count} link${count === 1 ? "" : "s"} detected and converted.`);
-            }
-            function copyConverterOutput() {
-                if (!converterOutput.value) return showToast("Nothing to copy.");
-                copyText(converterOutput.value);
-            }
-            function clearConverter() {
-                converterInput.innerHTML = "";
-                converterOutput.value = "";
-                converterCount.textContent = "0 links detected";
-                localStorage.removeItem(STORAGE.converter);
-                showToast("Converter cleared.");
-            }
-            function downloadConverterOutput() {
-                if (!converterOutput.value) return showToast("Nothing to download.");
-                const blob = new Blob([converterOutput.value], { type: "text/plain" }),
-                    a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = "converted-links.txt";
-                a.click();
-                URL.revokeObjectURL(a.href);
-            }
-            function updateConverterCount() {
-                const count = countDetectedLinks();
-                converterCount.textContent = `${count} link${count === 1 ? "" : "s"} detected`;
-                localStorage.setItem(STORAGE.converter, converterInput.innerHTML);
-            }
-            document.querySelectorAll(".tab").forEach((btn) =>
-                btn.addEventListener("click", () => {
-                    document.querySelectorAll(".tab").forEach((x) => x.classList.remove("active"));
-                    document.querySelectorAll(".tab-panel").forEach((x) => x.classList.remove("active"));
-                    btn.classList.add("active");
-                    document.getElementById(btn.dataset.tab).classList.add("active");
-                })
-            );
-            themeToggle.addEventListener("click", () => {
-                const dark = document.documentElement.dataset.theme === "dark";
-                document.documentElement.dataset.theme = dark ? "" : "dark";
-                localStorage.setItem(STORAGE.theme, dark ? "light" : "dark");
-                themeToggle.textContent = dark ? "Dark mode" : "Light mode";
-            });
-            let liveProcessTimer;
-            inputText.addEventListener("input", () => {
-                saveInput();
-                updateLiveStats();
-                clearTimeout(liveProcessTimer);
-                liveProcessTimer = setTimeout(() => processURLs({ live: true }), 180);
-            });
-            converterInput.addEventListener("input", updateConverterCount);
-            converterInput.addEventListener("paste", () => setTimeout(updateConverterCount, 0));
-            resultSearch.addEventListener("input", () => {
-                const q = resultSearch.value.toLowerCase();
-                document.querySelectorAll(".category").forEach((card) => {
-                    const ta = card.querySelector("textarea");
-                    card.style.display = !q || ta.value.toLowerCase().includes(q) ? "" : "none";
-                });
-            });
-            document.addEventListener("keydown", (e) => {
-                if (e.ctrlKey && e.key === "Enter") {
-                    e.preventDefault();
-                    processURLs();
-                }
-                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
-                    e.preventDefault();
-                    copyInput();
-                }
-            });
-            window.addEventListener("DOMContentLoaded", () => {
-                const theme = localStorage.getItem(STORAGE.theme);
-                if (theme === "dark") {
-                    document.documentElement.dataset.theme = "dark";
-                    themeToggle.textContent = "Light mode";
-                }
-                const saved = localStorage.getItem(STORAGE.input);
-                if (saved) {
-                    inputText.value = saved;
-                    processURLs();
-                } else loadDemo();
-                const conv = localStorage.getItem(STORAGE.converter);
-                if (conv) {
-                    converterInput.innerHTML = conv;
-                    updateConverterCount();
-                }
-            });
-        </script>
-    </body>
+        <button class="theme-btn" id="themeToggle">Dark mode</button>
+      </header>
+      <nav class="tabs">
+        <button class="tab active" data-tab="categorizer">
+          URL Categorizer</button
+        ><button class="tab" data-tab="converter">Text / Link Converter</button
+        ><button class="tab" data-tab="linkSpacer">Link Spacer</button>
+      </nav>
+
+      <section id="categorizer" class="tab-panel active">
+        <div class="card">
+          <div class="topline">
+            <strong>Input URLs</strong
+            ><span id="liveStats" class="live">0 lines</span>
+          </div>
+          <textarea
+            id="inputText"
+            placeholder="Paste URLs here, one URL per line..."
+          ></textarea>
+          <div class="toolbar">
+            <button class="btn green" onclick="loadDemo()">Load Demo</button>
+            <button class="btn primary" onclick="processURLs()">
+              Categorize URLs
+            </button>
+            <button class="btn orange" onclick="removeDuplicates()">
+              Remove Duplicate Domains
+            </button>
+            <button class="btn dark" onclick="shuffleInput()">
+              Shuffle URLs
+            </button>
+            <button class="btn gray" onclick="copyInput()">Copy Input</button>
+            <button class="btn red" onclick="clearAll()">Clear</button>
+          </div>
+          <div class="hint">
+            Auto-saved locally in your browser. Shortcut: <b>Ctrl + Enter</b> to
+            categorize.
+          </div>
+        </div>
+        <div id="stats" class="stats hidden"></div>
+        <div id="duplicatePanel" class="duplicate-panel hidden">
+          <h3>Duplicate Exact URLs</h3>
+          <p id="duplicateSummary"></p>
+          <div id="duplicateList" class="duplicate-list"></div>
+        </div>
+        <div class="search-wrap hidden" id="resultSearchWrap">
+          <input
+            id="resultSearch"
+            placeholder="Filter links across visible categories..."
+          />
+        </div>
+        <div id="results" class="results-grid"></div>
+      </section>
+
+      <section id="converter" class="tab-panel">
+        <div class="notice">
+          <b>Smart paragraph converter:</b> paste a normal paragraph directly
+          from a website, document, editor, or HTML source. Existing linked
+          words are automatically detected and preserved while the surrounding
+          text stays in place.
+        </div>
+        <div class="converter-grid">
+          <div class="card">
+            <div class="topline">
+              <strong>Source Text</strong
+              ><span id="converterCount" class="live">0 links detected</span>
+            </div>
+            <div
+              id="converterInput"
+              class="rich-source"
+              contenteditable="true"
+              spellcheck="true"
+              data-placeholder="Paste a paragraph here. For example: This is a paragraph with a linked word or phrase from a website..."
+            ></div>
+            <div class="hint">
+              Supports pasted rich-text hyperlinks, raw HTML
+              <code>&lt;a&gt;</code> tags, Markdown links and BBCode links. The
+              tool auto-detects linked text.
+            </div>
+          </div>
+          <div class="card">
+            <p class="preview-title">Converted Output</p>
+            <textarea
+              id="converterOutput"
+              class="converter-output"
+              readonly
+              placeholder="Your converted paragraph will appear here..."
+            ></textarea>
+            <div class="toolbar">
+              <button class="btn primary" onclick="copyConverterOutput()">
+                Copy Output</button
+              ><button class="btn gray" onclick="downloadConverterOutput()">
+                Download .txt
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card converter-options">
+          <div class="converter-controls">
+            <div class="field">
+              <label>Convert linked text to</label
+              ><select id="convertFormat">
+                <option value="html">HTML Anchor</option>
+                <option value="bbcode">BBCode</option>
+                <option value="markdown">Markdown</option>
+                <option value="plain">Plain text (remove links)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>HTML target</label
+              ><select id="targetOption">
+                <option value="none">Same tab</option>
+                <option value="blank">New tab (_blank)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Detected link handling</label
+              ><select id="converterDuplicates">
+                <option value="keep">Keep all links</option>
+                <option value="remove">Remove duplicate identical links</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quick action</label
+              ><button
+                class="btn primary"
+                style="width: 100%"
+                onclick="convertLinks()"
+              >
+                ✨ Convert Text
+              </button>
+            </div>
+          </div>
+          <div class="check-row">
+            <label
+              ><input type="checkbox" id="nofollowOption" /> Add
+              rel="nofollow"</label
+            ><label
+              ><input type="checkbox" id="noopenerOption" checked /> Add
+              noopener noreferrer for new tabs</label
+            ><label
+              ><input type="checkbox" id="escapeTextOption" checked /> Escape
+              HTML text safely</label
+            >
+          </div>
+          <div class="toolbar">
+            <button class="btn dark" onclick="convertLinks()">
+              ✨ Convert Text</button
+            ><button class="btn gray" onclick="clearConverter()">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="linkSpacer" class="tab-panel">
+        <div class="notice">
+          <b>Link Spacer:</b> paste a list of URLs separated by line breaks,
+          spaces, or tabs. The tool keeps every entry in its original order,
+          including duplicates, and inserts exactly one blank line between
+          entries.
+        </div>
+        <div class="converter-grid">
+          <div class="card">
+            <div class="topline">
+              <strong>Input URLs</strong
+              ><span id="spacerInputCount" class="live">0 entries</span>
+            </div>
+            <textarea
+              id="spacerInput"
+              placeholder="Paste URLs here. Entries can be separated by new lines, blank lines, spaces, or tabs..."
+            ></textarea>
+          </div>
+          <div class="card">
+            <div class="topline">
+              <strong>Formatted Output</strong
+              ><span id="spacerOutputCount" class="live">0 entries</span>
+            </div>
+            <textarea
+              id="spacerOutput"
+              readonly
+              placeholder="Formatted URLs will appear here..."
+            ></textarea>
+            <div class="toolbar">
+              <button class="btn primary" onclick="formatLinkSpacer()">
+                Format / Convert
+              </button>
+              <button class="btn gray" onclick="copyLinkSpacerOutput()">
+                Copy Output
+              </button>
+              <button class="btn red" onclick="clearLinkSpacer()">Clear</button>
+            </div>
+          </div>
+        </div>
+        <div class="hint">
+          Duplicates are preserved. URL text, query parameters, and fragments
+          are not edited. No trailing blank line is added.
+        </div>
+      </section>
+    </div>
+
+    <div id="toast" class="toast">Copied!</div>
+    <script>
+      const categoryNames = {
+        other: "Other",
+        chineseHtml: "Chinese HTML",
+        pixelWebApp: "Pixel / Web.app",
+        journal: "Journal Blog",
+        boardTopic: "Board Topic",
+        forumTopic: "Forum Topic",
+        metaComment: "Meta Comment",
+        nabble: "Nabble Sites",
+        yellowCaptcha: "Yellow Captcha",
+        eduGroupBy: "Edu Group By",
+        eduProfile: "Edu Profile",
+        padSites: "Pad Sites",
+        redirectSites: "Redirect Sites",
+        edu: "EDU",
+        gov: "GOV",
+        org: "ORG",
+        bloggerHtml: "Blogger HTML",
+      };
+      const STORAGE = {
+        input: "linkToolkit.input.v2",
+        converter: "linkToolkit.converter.v2",
+        theme: "linkToolkit.theme.v2",
+        spacerInput: "linkToolkit.spacer.input.v1",
+        spacerOutput: "linkToolkit.spacer.output.v1",
+      };
+      function createCategories() {
+        return {
+          other: [],
+          chineseHtml: [],
+          pixelWebApp: [],
+          journal: [],
+          boardTopic: [],
+          forumTopic: [],
+          metaComment: [],
+          nabble: [],
+          yellowCaptcha: [],
+          eduGroupBy: [],
+          eduProfile: [],
+          padSites: [],
+          redirectSites: [],
+          edu: [],
+          gov: [],
+          org: [],
+          bloggerHtml: [],
+        };
+      }
+      function isExternalHttpDestination(value, currentHost) {
+        try {
+          const destination = new URL(value);
+          return (
+            (destination.protocol === "http:" ||
+              destination.protocol === "https:") &&
+            !!destination.hostname &&
+            destination.hostname.toLowerCase().replace(/^www\./, "") !==
+              currentHost.toLowerCase().replace(/^www\./, "")
+          );
+        } catch {
+          return false;
+        }
+      }
+      function isRedirectUrl(url) {
+        const currentHost = url.hostname.toLowerCase();
+        const redirectParams = new Set([
+          "url",
+          "q",
+          "link",
+          "target",
+          "redirect",
+          "redirect_url",
+          "next",
+          "nexturl",
+          "destination",
+          "dest",
+        ]);
+        for (const [name, value] of url.searchParams.entries()) {
+          if (
+            redirectParams.has(name.toLowerCase()) &&
+            isExternalHttpDestination(value, currentHost)
+          )
+            return true;
+        }
+        return /^\/(?:url|jump-to\.php|external\.html|linker\.php)\/?$/i.test(
+          url.pathname,
+        );
+      }
+      function categorizeLinks(inputText) {
+        const categories = createCategories();
+        const lines = inputText
+          .split(/\r?\n/)
+          .map(x => x.trim())
+          .filter(Boolean);
+        for (const link of lines) {
+          let url;
+          try {
+            url = new URL(link);
+          } catch {
+            categories.other.push(link);
+            continue;
+          }
+          const hostname = url.hostname.toLowerCase(),
+            pathname = url.pathname.toLowerCase();
+          const hasCommentId = [...url.searchParams.keys()].some(
+            k => k.toLowerCase() === "commentid",
+          );
+          const seg = pathname.split("/").filter(Boolean);
+          const i = seg.findIndex(s => s === "post" || s === "single-post");
+          const hasArticle =
+            i !== -1 && i < seg.length - 1 && seg[i + 1].length > 0;
+          if (hasCommentId || hasArticle) {
+            categories.metaComment.push(link);
+            continue;
+          }
+          if (hostname.endsWith(".web.app")) {
+            categories.pixelWebApp.push(link);
+            continue;
+          }
+          if (
+            pathname.includes("/board/topic/") ||
+            pathname.includes("/board/board_topic/")
+          ) {
+            categories.boardTopic.push(link);
+            continue;
+          }
+          if (pathname.includes("/forum/topic/")) {
+            categories.forumTopic.push(link);
+            continue;
+          }
+          if (
+            pathname.includes("/journal3/") ||
+            pathname.includes("/journal2/") ||
+            pathname.includes("/journal/") ||
+            pathname.includes("journal-blog") ||
+            pathname.includes("journal_blog") ||
+            pathname.includes("/blog/") ||
+            pathname.startsWith("/blog") ||
+            pathname.includes("/blog03/") ||
+            pathname.includes("/blog02/") ||
+            pathname.includes("/blog01/")
+          ) {
+            categories.journal.push(link);
+            continue;
+          }
+
+          // New specific categories are checked before broad domain/file rules.
+          if (
+            hostname.includes(".s1.nabble.com") ||
+            (hostname.includes("nabble.com") &&
+              /\/template\/namlservlet\.jtp$/i.test(pathname) &&
+              url.searchParams.get("macro") === "start_registration_page")
+          ) {
+            categories.nabble.push(link);
+            continue;
+          }
+          // Yellow Captcha: de.tl / it.gg forum topic URLs
+          if (
+            (hostname.endsWith(".de.tl") || hostname.endsWith(".it.gg")) &&
+            /^\/forum\/topic-\d+-\d+-[^/?#]+\.htm$/i.test(pathname)
+          ) {
+            categories.yellowCaptcha.push(link);
+            continue;
+          }
+          if (/^\/profile\/[^/?#]+\/profile\/?$/i.test(pathname)) {
+            categories.eduGroupBy.push(link);
+            continue;
+          }
+          if (/^\/profile\/[^/?#]+\/?$/i.test(pathname)) {
+            categories.eduProfile.push(link);
+            continue;
+          }
+          if (/^\/s\/[^/?#]+\/?$/i.test(pathname)) {
+            categories.padSites.push(link);
+            continue;
+          }
+          if (isRedirectUrl(url)) {
+            categories.redirectSites.push(link);
+            continue;
+          }
+
+          if (hostname.endsWith(".edu") || hostname.includes(".edu.")) {
+            categories.edu.push(link);
+            continue;
+          }
+          if (hostname.endsWith(".gov") || hostname.includes(".gov.")) {
+            categories.gov.push(link);
+            continue;
+          }
+          if (hostname.endsWith(".org") || hostname.includes(".org.")) {
+            categories.org.push(link);
+            continue;
+          }
+          if (/\/\d+\.html$/i.test(pathname)) {
+            categories.chineseHtml.push(link);
+            continue;
+          }
+          if (pathname.endsWith(".html")) {
+            categories.bloggerHtml.push(link);
+            continue;
+          }
+          categories.other.push(link);
+        }
+        return categories;
+      }
+      function processURLs(options = {}) {
+        const input = inputText.value;
+        if (!input.trim()) {
+          results.innerHTML = "";
+          stats.innerHTML = "";
+          stats.classList.add("hidden");
+          duplicatePanel.classList.add("hidden");
+          resultSearchWrap.classList.add("hidden");
+          saveInput();
+          return;
+        }
+        const categories = categorizeLinks(input);
+        displayResults(categories);
+        analyzeDuplicates(input);
+        saveInput();
+      }
+      function displayResults(categories) {
+        results.innerHTML = "";
+        for (const key in categories) {
+          const links = categories[key];
+          const card = document.createElement("div");
+          card.className = "category";
+          card.dataset.key = key;
+          card.innerHTML = `<div class="category-header"><div class="category-title">${categoryNames[key]}</div><div class="category-count">${links.length}</div></div><textarea id="output-${key}" readonly>${escapeHtml(links.join("\n"))}</textarea><div class="category-actions"><button class="btn dark" onclick="copyCategory('${key}')">Copy</button><button class="btn gray" onclick="shuffleCategory('${key}')">Shuffle</button></div>`;
+          results.appendChild(card);
+        }
+        updateStats(categories);
+        resultSearchWrap.classList.remove("hidden");
+      }
+      function getDomainUniqueData(lines) {
+        const seen = new Set(),
+          unique = [];
+        let removed = 0;
+        for (const link of lines) {
+          const domain = getDomainKey(link);
+          const key = domain ? `domain:${domain}` : `invalid:${unique.length}`;
+          if (domain && seen.has(key)) {
+            removed++;
+            continue;
+          }
+          if (domain) seen.add(key);
+          unique.push(link);
+        }
+        return { unique, removed };
+      }
+      function updateStats(categories) {
+        let total = 0;
+        for (const k in categories) total += categories[k].length;
+        const lines = getInputLines();
+        const domainData = getDomainUniqueData(lines);
+        const exactUnique = new Set(lines).size;
+        const exactDuplicateEntries = lines.length - exactUnique;
+        stats.classList.remove("hidden");
+        stats.innerHTML = `<div class="stat"><div class="stat-label">Total URLs</div><div class="stat-value">${total}</div></div><div class="stat"><div class="stat-label">Unique URLs</div><div class="stat-value">${domainData.unique.length}</div></div><div class="stat"><div class="stat-label">Duplicate Domains</div><div class="stat-value">${domainData.removed}</div></div><div class="stat"><div class="stat-label">Exact Duplicate Entries</div><div class="stat-value">${exactDuplicateEntries}</div></div><div class="stat"><div class="stat-label">Categories</div><div class="stat-value">${Object.keys(categories).length}</div></div>`;
+      }
+      function analyzeDuplicates(input) {
+        const lines = input
+            .split(/\r?\n/)
+            .map(x => x.trim())
+            .filter(Boolean),
+          counts = new Map();
+        lines.forEach(x => counts.set(x, (counts.get(x) || 0) + 1));
+        const duplicates = [...counts.entries()].filter(([, c]) => c > 1);
+        duplicatePanel.classList.remove("hidden");
+        if (!duplicates.length) {
+          duplicateSummary.textContent = "No duplicate exact URLs found.";
+          duplicateList.innerHTML = "<div>No duplicates.</div>";
+          return;
+        }
+        const entries = duplicates.reduce((t, [, c]) => t + c - 1, 0);
+        duplicateSummary.textContent = `${duplicates.length} unique URLs are duplicated, creating ${entries} duplicate entries.`;
+        duplicateList.innerHTML = duplicates
+          .map(
+            ([l, c]) =>
+              `<div class="duplicate-item"><span class="duplicate-count">${c}×</span>&nbsp; ${escapeHtml(l)}</div>`,
+          )
+          .join("");
+      }
+      function getDomainKey(link) {
+        try {
+          return new URL(link.trim()).hostname
+            .toLowerCase()
+            .replace(/^www\./, "");
+        } catch {
+          return null;
+        }
+      }
+      function removeDuplicates() {
+        const lines = getInputLines();
+        if (!lines.length) return showToast("No URLs to process.");
+        const data = getDomainUniqueData(lines);
+        inputText.value = data.unique.join("\n");
+        processURLs();
+        showToast(
+          data.removed
+            ? `${data.removed} duplicate domain URLs removed.`
+            : "No duplicate domains found.",
+        );
+      }
+      function shuffleArray(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+      }
+      function shuffleInput() {
+        const a = getInputLines();
+        if (!a.length) return showToast("No URLs to shuffle.");
+        shuffleArray(a);
+        inputText.value = a.join("\n");
+        processURLs();
+        showToast("URLs shuffled.");
+      }
+      function shuffleCategory(k) {
+        const t = document.getElementById("output-" + k);
+        if (!t || !t.value.trim()) return showToast("This category is empty.");
+        const a = t.value.split(/\r?\n/).filter(Boolean);
+        shuffleArray(a);
+        t.value = a.join("\n");
+        showToast(categoryNames[k] + " shuffled.");
+      }
+      function copyCategory(k) {
+        const t = document.getElementById("output-" + k);
+        if (!t || !t.value) return showToast("Category is empty.");
+        copyText(t.value);
+      }
+      function copyInput() {
+        if (!inputText.value.trim()) return showToast("Input is empty.");
+        copyText(inputText.value);
+      }
+      function copyText(text) {
+        navigator.clipboard
+          ?.writeText(text)
+          .then(() => showToast("Copied!"))
+          .catch(() => {
+            const t = document.createElement("textarea");
+            t.value = text;
+            document.body.appendChild(t);
+            t.select();
+            document.execCommand("copy");
+            t.remove();
+            showToast("Copied!");
+          });
+      }
+      function getInputLines() {
+        return inputText.value
+          .split(/\r?\n/)
+          .map(x => x.trim())
+          .filter(Boolean);
+      }
+      function clearAll() {
+        if (!confirm("Clear all URLs and results?")) return;
+        inputText.value = "";
+        results.innerHTML = "";
+        stats.innerHTML = "";
+        stats.classList.add("hidden");
+        duplicatePanel.classList.add("hidden");
+        duplicateList.innerHTML = "";
+        resultSearchWrap.classList.add("hidden");
+        localStorage.removeItem(STORAGE.input);
+        updateLiveStats();
+        showToast("Cleared.");
+      }
+      function loadDemo() {
+        const demo = `https://www.chaoqgroup.com/blog/best-leather-bags\nhttps://example.com/123.html\nhttps://example.com/article-name.html\nhttps://test-site.web.app/?topic=ABC123\nhttps://example.edu/news/example\nhttps://example.gov/official/news\nhttps://example.org/about-us\nhttps://example.com/forum/topic/64758/test-topic\nhttps://example.com/post/simple-article-title?commentId=123\nhttps://example.com/post/simple-article-title`;
+        inputText.value = demo;
+        processURLs();
+        updateLiveStats();
+      }
+      function escapeHtml(t) {
+        return String(t)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+      let toastTimer;
+      function showToast(m) {
+        toast.textContent = m;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+      function saveInput() {
+        localStorage.setItem(STORAGE.input, inputText.value);
+      }
+      function updateLiveStats() {
+        const lines = getInputLines();
+        const valid = lines.filter(x => {
+          try {
+            new URL(x);
+            return true;
+          } catch {
+            return false;
+          }
+        }).length;
+        const unique = getDomainUniqueData(lines).unique.length;
+        liveStats.textContent = `${lines.length} lines • ${valid} valid URLs • ${unique} unique`;
+      }
+      function normalizeSourceToHtml(raw) {
+        const trimmed = raw.trim();
+        if (!trimmed) return "";
+        // Raw HTML pasted/typed into the editor
+        if (/<a\b[^>]*href\s*=/i.test(trimmed)) return trimmed;
+        // Convert Markdown and BBCode into HTML anchors before DOM processing
+        let html = escapeHtml(trimmed)
+          .replace(
+            /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi,
+            '<a href="$2">$1</a>',
+          )
+          .replace(
+            /\[url=(https?:\/\/[^\]]+)\]([\s\S]*?)\[\/url\]/gi,
+            '<a href="$1">$2</a>',
+          );
+        return html.replace(/\n/g, "<br>");
+      }
+      function getConverterSourceHtml() {
+        const editor = document.getElementById("converterInput");
+        const raw = editor.innerHTML.trim();
+        // If user typed literal HTML into contenteditable, browser may have escaped it.
+        const text = editor.innerText.trim();
+        if (/<a\b[^>]*href\s*=/i.test(text) && !editor.querySelector("a"))
+          return normalizeSourceToHtml(text);
+        return raw;
+      }
+      function sourceDom() {
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = getConverterSourceHtml();
+        // Detect Markdown / BBCode that may still be plain text in the editor.
+        if (!wrapper.querySelector("a")) {
+          wrapper.innerHTML = normalizeSourceToHtml(wrapper.innerText);
+        }
+        return wrapper;
+      }
+      function convertNode(node, format, opts, seen) {
+        if (node.nodeType === Node.TEXT_NODE) return node.nodeValue;
+        if (node.nodeType !== Node.ELEMENT_NODE) return "";
+        if (node.tagName === "BR") return "\n";
+        if (node.tagName === "A") {
+          const href = node.getAttribute("href") || "";
+          const text = node.textContent || href;
+          const key = href + "\u0000" + text;
+          if (opts.removeDuplicates && seen.has(key)) return text;
+          seen.add(key);
+          if (format === "plain") return text;
+          if (format === "markdown") return `[${text}](${href})`;
+          if (format === "bbcode") return `[url=${href}]${text}[/url]`;
+          const safeText = opts.safe ? escapeHtml(text) : text;
+          let attrs = `href="${escapeHtml(href)}"`;
+          if (opts.target === "blank") attrs += ' target="_blank"';
+          const rel = [];
+          if (opts.nofollow) rel.push("nofollow");
+          if (opts.target === "blank" && opts.noopener)
+            rel.push("noopener", "noreferrer");
+          if (rel.length) attrs += ` rel="${rel.join(" ")}"`;
+          return `<a ${attrs}>${safeText}</a>`;
+        }
+        const children = [...node.childNodes]
+          .map(n => convertNode(n, format, opts, seen))
+          .join("");
+        if (format === "html") {
+          // Preserve basic paragraph/list structure for HTML output.
+          const tag = node.tagName.toLowerCase();
+          if (
+            [
+              "p",
+              "div",
+              "li",
+              "blockquote",
+              "h1",
+              "h2",
+              "h3",
+              "h4",
+              "h5",
+              "h6",
+            ].includes(tag)
+          )
+            return `<${tag}>${children}</${tag}>`;
+        }
+        if (["P", "DIV", "LI", "BLOCKQUOTE"].includes(node.tagName))
+          return children + "\n";
+        return children;
+      }
+      function countDetectedLinks() {
+        const dom = sourceDom();
+        return dom.querySelectorAll("a[href]").length;
+      }
+      function convertLinks() {
+        const editor = document.getElementById("converterInput");
+        if (!editor.innerText.trim())
+          return showToast("Please paste some source text first.");
+        const dom = sourceDom();
+        const format = convertFormat.value;
+        const opts = {
+          target: targetOption.value,
+          nofollow: nofollowOption.checked,
+          noopener: noopenerOption.checked,
+          safe: escapeTextOption.checked,
+          removeDuplicates: converterDuplicates.value === "remove",
+        };
+        const seen = new Set();
+        const out = [...dom.childNodes]
+          .map(n => convertNode(n, format, opts, seen))
+          .join("")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        converterOutput.value = out;
+        localStorage.setItem(STORAGE.converter, editor.innerHTML);
+        const count = dom.querySelectorAll("a[href]").length;
+        showToast(
+          `${count} link${count === 1 ? "" : "s"} detected and converted.`,
+        );
+      }
+      function copyConverterOutput() {
+        if (!converterOutput.value) return showToast("Nothing to copy.");
+        copyText(converterOutput.value);
+      }
+      function clearConverter() {
+        converterInput.innerHTML = "";
+        converterOutput.value = "";
+        converterCount.textContent = "0 links detected";
+        localStorage.removeItem(STORAGE.converter);
+        showToast("Converter cleared.");
+      }
+      function downloadConverterOutput() {
+        if (!converterOutput.value) return showToast("Nothing to download.");
+        const blob = new Blob([converterOutput.value], { type: "text/plain" }),
+          a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "converted-links.txt";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      }
+      function updateConverterCount() {
+        const count = countDetectedLinks();
+        converterCount.textContent = `${count} link${count === 1 ? "" : "s"} detected`;
+        localStorage.setItem(STORAGE.converter, converterInput.innerHTML);
+      }
+      function getSpacerEntries(raw) {
+        const trimmed = String(raw || "").trim();
+        return trimmed ? trimmed.split(/\s+/) : [];
+      }
+      function updateSpacerCounts() {
+        const input = document.getElementById("spacerInput");
+        const output = document.getElementById("spacerOutput");
+        const inputCount = document.getElementById("spacerInputCount");
+        const outputCount = document.getElementById("spacerOutputCount");
+        const inputEntries = getSpacerEntries(input.value);
+        const outputEntries = getSpacerEntries(output.value);
+        inputCount.textContent = `${inputEntries.length} entr${inputEntries.length === 1 ? "y" : "ies"}`;
+        outputCount.textContent = `${outputEntries.length} entr${outputEntries.length === 1 ? "y" : "ies"}`;
+      }
+      function formatLinkSpacer() {
+        const input = document.getElementById("spacerInput");
+        const output = document.getElementById("spacerOutput");
+        const entries = getSpacerEntries(input.value);
+        if (!entries.length) {
+          output.value = "";
+          updateSpacerCounts();
+          return showToast("Please paste some URLs first.");
+        }
+        output.value = entries.join("\n\n");
+        localStorage.setItem(STORAGE.spacerInput, input.value);
+        localStorage.setItem(STORAGE.spacerOutput, output.value);
+        updateSpacerCounts();
+        showToast(`${entries.length} entries formatted.`);
+      }
+      function copyLinkSpacerOutput() {
+        const output = document.getElementById("spacerOutput");
+        if (!output.value) return showToast("Nothing to copy.");
+        copyText(output.value);
+      }
+      function clearLinkSpacer() {
+        document.getElementById("spacerInput").value = "";
+        document.getElementById("spacerOutput").value = "";
+        localStorage.removeItem(STORAGE.spacerInput);
+        localStorage.removeItem(STORAGE.spacerOutput);
+        updateSpacerCounts();
+        showToast("Link Spacer cleared.");
+      }
+
+      document.querySelectorAll(".tab").forEach(btn =>
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab")
+            .forEach(x => x.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-panel")
+            .forEach(x => x.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById(btn.dataset.tab).classList.add("active");
+        }),
+      );
+      themeToggle.addEventListener("click", () => {
+        const dark = document.documentElement.dataset.theme === "dark";
+        document.documentElement.dataset.theme = dark ? "" : "dark";
+        localStorage.setItem(STORAGE.theme, dark ? "light" : "dark");
+        themeToggle.textContent = dark ? "Dark mode" : "Light mode";
+      });
+      let liveProcessTimer;
+      inputText.addEventListener("input", () => {
+        saveInput();
+        updateLiveStats();
+        clearTimeout(liveProcessTimer);
+        liveProcessTimer = setTimeout(() => processURLs({ live: true }), 180);
+      });
+      converterInput.addEventListener("input", updateConverterCount);
+      converterInput.addEventListener("paste", () =>
+        setTimeout(updateConverterCount, 0),
+      );
+      document.getElementById("spacerInput").addEventListener("input", () => {
+        localStorage.setItem(
+          STORAGE.spacerInput,
+          document.getElementById("spacerInput").value,
+        );
+        updateSpacerCounts();
+      });
+      resultSearch.addEventListener("input", () => {
+        const q = resultSearch.value.toLowerCase();
+        document.querySelectorAll(".category").forEach(card => {
+          const ta = card.querySelector("textarea");
+          card.style.display =
+            !q || ta.value.toLowerCase().includes(q) ? "" : "none";
+        });
+      });
+      document.addEventListener("keydown", e => {
+        if (e.ctrlKey && e.key === "Enter") {
+          e.preventDefault();
+          processURLs();
+        }
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
+          e.preventDefault();
+          copyInput();
+        }
+      });
+      window.addEventListener("DOMContentLoaded", () => {
+        const theme = localStorage.getItem(STORAGE.theme);
+        if (theme === "dark") {
+          document.documentElement.dataset.theme = "dark";
+          themeToggle.textContent = "Light mode";
+        }
+        const saved = localStorage.getItem(STORAGE.input);
+        if (saved) {
+          inputText.value = saved;
+          processURLs();
+        } else loadDemo();
+        const conv = localStorage.getItem(STORAGE.converter);
+        if (conv) {
+          converterInput.innerHTML = conv;
+          updateConverterCount();
+        }
+        const spacerIn = localStorage.getItem(STORAGE.spacerInput);
+        const spacerOut = localStorage.getItem(STORAGE.spacerOutput);
+        if (spacerIn !== null)
+          document.getElementById("spacerInput").value = spacerIn;
+        if (spacerOut !== null)
+          document.getElementById("spacerOutput").value = spacerOut;
+        updateSpacerCounts();
+      });
+    </script>
+  </body>
 </html>
